@@ -15,11 +15,11 @@ const { getAliExpressProduct } = require('./scrapers/aliexpress');
 
 const app = express();
 app.use(cors({
-  origin: ['https://drop-spy-six.vercel.app', 'http://localhost:5173'],
-  credentials: true,
+  origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
+app.options('*', cors());
 app.use(express.json());
 
 // ─── DB & Cache ────────────────────────────────────────────────────────────────
