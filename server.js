@@ -1,6 +1,3 @@
-// WinningHunter — Backend API
-// Stack: Node.js, Express, PostgreSQL (via pg), Redis (cache), Stripe
-
 const express = require('express');
 const cors = require('cors');
 const { Pool } = require('pg');
@@ -11,18 +8,19 @@ const bcrypt = require('bcryptjs');
 const cron = require('node-cron');
 const { scrapeAdLibrary } = require('./scrapers/facebook');
 const { scrapeShopify } = require('./scrapers/shopify');
-const { getAliExpressProduct } = require('./scrapers/aliexpress');
+const { calculateWinningScore } = require('./scrapers/aliexpress');
 
 const app = express();
-app.use(cors({
-  origin: '*',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
-app.options('*', cors());
-app.use(express.json());
 
-// ─── DB & Cache ────────────────────────────────────────────────────────────────
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  if (req.method === 'OPTIONS') return res.sendStatus(200);
+  next();
+});
+
+app.use(express.json());
 const db = new Pool({ connectionString: process.env.DATABASE_URL });
 const cache = redis.createClient({ url: process.env.REDIS_URL });
 cache.connect();
